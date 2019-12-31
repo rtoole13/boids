@@ -27,12 +27,13 @@ class Boid {
         var angle = getRandomNumber(0, 2 * Math.PI);
         this.velocity = scalarVectorMult(getRandomNumber(0, maxSpeed), {x: Math.cos(angle), y: Math.sin(angle)});
         this.acceleration = {x: 0, y: 0};
-        this.neighborHoodRadius = 2;
+        this.neighborHoodRadius = 50;
+        this.neighborHoodRadiusSq = this.neighborHoodRadius * this.neighborHoodRadius;
         this.maxForce = 5;
         this.maxForceSq = this.maxForce * this.maxForce;
         this.maxSpeed = maxSpeed;
         this.maxSpeedSq = maxSpeed * maxSpeed;
-        this.desiredSeparation = 50;
+        this.desiredSeparation = 25;
         this.desiredSeparationSq = this.desiredSeparation * this.desiredSeparation;
 
         // Visual
@@ -107,49 +108,39 @@ class Boid {
         return steering;
     }
 
-    // float desiredseparation = 25.0f;
-    //     PVector steer = new PVector(0, 0, 0);
-    //     int count = 0;
-    //     // For every boid in the system, check if it's too close
-    //     for (Boid other : boids) {
-    //       float d = PVector.dist(position, other.position);
-    //       // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
-    //       if ((d > 0) && (d < desiredseparation)) {
-    //         // Calculate vector pointing away from neighbor
-    //         PVector diff = PVector.sub(position, other.position);
-    //         diff.normalize();
-    //         diff.div(d);        // Weight by distance
-    //         steer.add(diff);
-    //         count++;            // Keep track of how many
-    //       }
-    //     }
-    //     // Average -- divide by how many
-    //     if (count > 0) {
-    //       steer.div((float)count);
-    //     }
-    //
-    //     // As long as the vector is greater than 0
-    //     if (steer.mag() > 0) {
-    //       // First two lines of code below could be condensed with new PVector setMag() method
-    //       // Not using this method until Processing.js catches up
-    //       // steer.setMag(maxspeed);
-    //
-    //       // Implement Reynolds: Steering = Desired - Velocity
-    //       steer.normalize();
-    //       steer.mult(maxspeed);
-    //       steer.sub(velocity);
-    //       steer.limit(maxforce);
-    //     }
-    //     return steer;
-
-
-
     align(boids){
-        return {x: 0, y: 0};
+        //Calculate average velocity of neighborhood
+        var steer, sum, count;
+        steer = {x: 0, y: 0};
+        sum = {x: 0, y: 0};
+        count = 0;
+        for (var i = 0; i < boids.length; i++){
+            var boid = boids[i];
+            if (this == boid){
+                continue;
+            }
+            var distSq = distanceSq(this.position, boid.position);
+            if (distSq > 0 && distSq < this.neighborHoodRadiusSq){
+                //FIXME considering all boids in radius, could and probably should ignore the ones immediately behind!
+                sum = vectorAdd(sum, boid.velocity);
+                count++;
+            }
+        }
+        if (count > 0){
+            // Average
+            //FIXME unneccessary? Likely in all cases, no need to average here since normalizing later
+            //Steer = Desired - Velocity
+            sum = scalarVectorMult(1/count, sum);
+            var dir = normalizeVector(sum);
+            sum = scalarVectorMult(this.maxSpeed, dir);
+            steer = limitVectorMagSq(vectorSubtract(sum, this.velocity), this.maxForce, this.maxForceSq);
+        }
+        return steer;
     }
 
     cohere(boids){
-        return {x: 0, y: 0};
+        var steer = {x: 0, y: 0};
+        return steer;
     }
 
     maybeWrap(){
