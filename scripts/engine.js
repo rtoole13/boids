@@ -2,6 +2,8 @@
 
 function update(dt){
     flock.update(dt);
+    debugMouseBoid.position.x = mouseX;
+    debugMouseBoid.position.y = mouseY;
 }
 
 // function updateFlock(dt){
@@ -70,6 +72,19 @@ function limitVectorMagnitude(v, limit){
 function vectorAdd(v1, v2){
     return {x: v1.x + v2.x,
             y: v1.y + v2.y};
+}
+
+function vectorSubtract(v1, v2){
+    // v1 - v2
+    return {x: v1.x - v2.x,
+            y: v1.y - v2.y};
+}
+function distance(p1, p2){
+    return Math.sqrt(distanceSq(p1, p2));
+}
+
+function distanceSq(p1, p2){
+    return Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2);
 }
 
 function dotProduct(v1, v2){

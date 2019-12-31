@@ -6,15 +6,18 @@ var CANVASHEIGHT = 760,
     maxSpeed = 25,
     boidCount = 10,
     boidWidth = 10,
-    boidHeight = 30,
+    boidHeight = 20,
     separationWeight = 1.5,
     alignmentWeight = 1.0,
     cohesionWeight = 1.0,
 
 //controls
+    mouseX,
+    mouseY,
     playbackPaused = false,
 
 //main objects
+    debugMouseBoid,
     canvas,
     canvasContext,
     currentFrameTimeStamp,
@@ -28,6 +31,7 @@ var CANVASHEIGHT = 760,
 
 window.onload = function(){
     canvas = document.getElementById("gameCanvas");
+    canvas.addEventListener("mousemove", getMousePosition, false)
     canvas.height = CANVASHEIGHT;
     canvas.width = CANVASWIDTH;
     canvasContext = canvas.getContext("2d");
@@ -47,6 +51,8 @@ function initializeBoids(){
     for (var i = 0; i < boidCount; i++){
         flock.add(new Boid(Math.random() * canvas.width, Math.random() * canvas.height));
     }
+    debugMouseBoid = new Boid(0, 0);
+    flock.add(debugMouseBoid);
 }
 function main() {
     currentFrameTimeStamp = new Date();
@@ -58,4 +64,12 @@ function main() {
         return;
     }
     requestAnimationFrame(main);
+}
+
+function getMousePosition(e){
+	var rect = canvas.getBoundingClientRect(),
+        root = document.documentElement;
+
+	mouseX = e.pageX - rect.left - root.scrollLeft;
+	mouseY = e.pageY - rect.top - root.scrollTop;
 }
