@@ -4,10 +4,12 @@
 var CANVASHEIGHT = 760,
     CANVASWIDTH = 1024,
     maxSpeed = 25,
-    maxAccel = 100,
-    boidCount = 45,
+    boidCount = 10,
     boidWidth = 10,
-    boidHeight = 10,
+    boidHeight = 30,
+    separationWeight = 1.5,
+    alignmentWeight = 1.0,
+    cohesionWeight = 1.0,
 
 //controls
     playbackPaused = false,
@@ -21,7 +23,8 @@ var CANVASHEIGHT = 760,
     dtMax = 1/15,
 
 //game objects
-    boids = [];
+    flock;
+    //boids = [];
 
 window.onload = function(){
     canvas = document.getElementById("gameCanvas");
@@ -40,8 +43,9 @@ function init() {
 }
 
 function initializeBoids(){
+    flock = new Flock();
     for (var i = 0; i < boidCount; i++){
-        boids.push(new Boid(Math.random() * canvas.width, Math.random() * canvas.height));
+        flock.add(new Boid(Math.random() * canvas.width, Math.random() * canvas.height));
     }
 }
 function main() {

@@ -1,28 +1,92 @@
 "use strict";
 
 function update(dt){
-    updateBoids(dt);
+    flock.update(dt);
 }
 
-function updateBoids(dt){
-    for (var i = 0; i < boids.length; i++){
-        boids[i].update(dt);
-    }
-}
+// function updateFlock(dt){
+//     for (var i = 0; i < boids.length; i++){
+//         boids[i].update(dt);
+//     }
+// }
 
-function rotateVector(xi, yi, theta, isDegrees){
+function rotateVector(v, theta, isDegrees){
     if (isDegrees){
         theta *= Math.PI/180;
     }
-    return {x: xi * Math.cos(theta) - yi * Math.sin(theta),
-            y: xi * Math.sin(theta) + yi * Math.cons(theta)};
+    return {x: v.x * Math.cos(theta) - v.y * Math.sin(theta),
+            y: v.x * Math.sin(theta) + v.y * Math.cons(theta)};
+}
+
+function getVectorMagnitude(v){
+    return Math.sqrt(getVectorMagnitudeSq(v));
+}
+
+function getVectorMagnitudeSq(v){
+    return Math.pow(v.x, 2) + Math.pow(v.y, 2);
+}
+
+function normalizeVector(v){
+    var magnitude = getVectorMagnitude(v);
+    return {x: v.x / magnitude,
+            y: v.y / magnitude};
 }
 
 function getRandomVector(min, max){
-    return {x: min + max * Math.random(),
-            y: min + max * Math.random()};
+    return {x: getRandomNumber(min, max),
+            y: getRandomNumber(min, max)};
 }
 
-function scalarVectorMult(scalar, vector){
-    return {x: scalar * vector.x, y: scalar * vector.y};
+function getRandomNumber(min, max){
+    return min + (max - min) * Math.random();
+}
+
+function scalarVectorMult(scalar, v){
+    return {x: scalar * v.x, y: scalar * v.y};
+}
+
+function limitVectorMagSq(v, limit, sqLimit){
+    var magSq, dir;
+    magSq = getVectorMagnitudeSq(v);
+    if (magSq <= sqLimit){
+        return v;
+    }
+    dir = normalizeVector(v);
+    return {x: limit * dir.x,
+            y: limit * dir.y}
+}
+
+function limitVectorMagnitude(v, limit){
+    var magSq, dir;
+    magSq = getVectorMagnitudeSq(v);
+    if (magSq <= (limit * limit)){
+        return v;
+    }
+    dir = normalizeVector(v);
+    return {x: limit * dir.x,
+            y: limit * dir.y}
+}
+
+function vectorAdd(v1, v2){
+    return {x: v1.x + v2.x,
+            y: v1.y + v2.y};
+}
+
+function dotProduct(v1, v2){
+    return v1.x * v2.x + v1.y * v2.y;
+}
+
+function getAngleFromVector(v, inDegrees){
+	if (v.y >= 0){
+        if (!inDegrees){
+            return - Math.acos(v.x);
+        }
+		return - Math.acos(v.x) * 180 / Math.PI;
+	}
+	else{
+        if (!inDegrees){
+            return Math.acos(v.x);
+        }
+		return Math.acos(v.x) * 180 / Math.PI;
+	}
 }

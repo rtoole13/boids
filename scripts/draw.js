@@ -2,7 +2,7 @@
 
 function draw(){
     drawBackground();
-    drawBoids();
+    flock.draw();
 }
 
 function drawBackground(){
@@ -17,9 +17,19 @@ function drawBoids(){
 }
 
 function drawTriangle(x, y, base, height, angle, color){
-    // canvasContext.save();
-    canvasContext.fillStyle = color;
+    canvasContext.save();
+    canvasContext.strokeStyle = color;
+    canvasContext.beginPath();
+    canvasContext.translate(x, y);
+    canvasContext.rotate(-1 * (angle + Math.PI/2));
+    canvasContext.moveTo(0, height);
+    canvasContext.lineTo(-base / 2, 0);
+    canvasContext.lineTo(base / 2, 0);
+    canvasContext.closePath();
+    canvasContext.stroke();
+    canvasContext.restore();
     // canvasContext.fillRect(100, 100, 200, 200);
-    canvasContext.fillRect(x - (base/2), y - (height/2), base, height);
-    // canvasContext.restore();
+    // canvasContext.fillStyle = color;
+    // canvasContext.fillRect(0, 0, base, height);
+
 }
