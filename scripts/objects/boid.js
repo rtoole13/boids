@@ -27,9 +27,11 @@ class Boid {
         var angle = getRandomNumber(0, 2 * Math.PI);
         this.velocity = scalarVectorMult(getRandomNumber(0, maxSpeed), {x: Math.cos(angle), y: Math.sin(angle)});
         this.acceleration = {x: 0, y: 0};
-        this.neighborHoodRadius = 50;
-        this.neighborHoodRadiusSq = this.neighborHoodRadius * this.neighborHoodRadius;
-        this.maxForce = 5;
+        this.alignmentNeighborHoodRadius = 50;
+        this.alignmentNeighborHoodRadiusSq = this.alignmentNeighborHoodRadius * this.alignmentNeighborHoodRadius;
+        this.cohesionNeighborHoodRadius = 175;
+        this.cohesionNeighborHoodRadiusSq = this.cohesionNeighborHoodRadius * this.cohesionNeighborHoodRadius;
+        this.maxForce = 7;
         this.maxForceSq = this.maxForce * this.maxForce;
         this.maxSpeed = maxSpeed;
         this.maxSpeedSq = maxSpeed * maxSpeed;
@@ -120,7 +122,7 @@ class Boid {
                 continue;
             }
             var distSq = distanceSq(this.position, boid.position);
-            if (distSq > 0 && distSq < this.neighborHoodRadiusSq){
+            if (distSq > 0 && distSq < this.alignmentNeighborHoodRadiusSq){
                 //FIXME considering all boids in radius, could and probably should ignore the ones immediately behind!
                 sum = vectorAdd(sum, boid.velocity);
                 count++;
@@ -139,8 +141,33 @@ class Boid {
     }
 
     cohere(boids){
-        var steer = {x: 0, y: 0};
+        // Steer towards center of mass of neighbors
+        var steer, sum, count;
+        steer = {x: 0, y: 0};
+        sum = {x: 0, y: 0};
+
+        for (var i = 0; i < boids.length; i++){
+            var boid = boids[i];
+            if (this == boid){
+                continue;
+            }
+            var distSq = distanceSq(this.position, boid.position);
+            if (distSq > 0 && distSq < this.cohesionNeighborHoodRadiusSq){
+                sum = vectorAdd(sum, boid.velocity);
+                count++;
+            }
+        }
+        if (count > 0){
+            sum = scalarVectorMult(1/count, sum); // steer towards center
+            return this.seek(sum);
+        }
         return steer;
+    }
+
+    seek(target){
+        var steer = normalizeVector(vectorSubtract(target, this.position));
+        steer = scalarVectorMult(this.maxSpeed, steer);
+        return limitVectorMagSq(vectorSubtract(steer, this.velocity), this.maxForce, this.maxForceSq);
     }
 
     maybeWrap(){

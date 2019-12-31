@@ -4,7 +4,7 @@
 var CANVASHEIGHT = 760,
     CANVASWIDTH = 1024,
     maxSpeed = 25,
-    boidCount = 10,
+    boidCount = 50,
     boidWidth = 10,
     boidHeight = 20,
     separationWeight = 1.5,
