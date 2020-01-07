@@ -17,7 +17,7 @@ function rotateVector(v, theta, isDegrees){
         theta *= Math.PI/180;
     }
     return {x: v.x * Math.cos(theta) - v.y * Math.sin(theta),
-            y: v.x * Math.sin(theta) + v.y * Math.cons(theta)};
+            y: v.x * Math.sin(theta) + v.y * Math.cos(theta)};
 }
 
 function getVectorMagnitude(v){
@@ -56,6 +56,12 @@ function limitVectorMagSq(v, limit, sqLimit){
     dir = normalizeVector(v);
     return {x: limit * dir.x,
             y: limit * dir.y}
+}
+
+function getRandomDirectionInAngleRange(v, angle, isDegrees){
+    //Given a vector and an angle, return a vector within +/- angle from vector
+    var rotationAngle = getRandomNumber(-angle, angle);
+    return rotateVector(v, rotationAngle, isDegrees);
 }
 
 function limitVectorMagnitude(v, limit){

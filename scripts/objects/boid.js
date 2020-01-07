@@ -37,6 +37,7 @@ class Boid {
         this.maxSpeedSq = maxSpeed * maxSpeed;
         this.desiredSeparation = 25;
         this.desiredSeparationSq = this.desiredSeparation * this.desiredSeparation;
+        this.jitterAngle = jitterAngle;
 
         // Visual
         this.width = boidWidth;
@@ -76,6 +77,9 @@ class Boid {
         this.updateAcceleration(separation);
         this.updateAcceleration(alignment);
         this.updateAcceleration(cohesion);
+
+        // var jitter = scalarVectorMult(jitterWeight, this.jitter());
+        // this.updateAcceleration(jitter);
     }
 
     separate(boids){
@@ -161,6 +165,15 @@ class Boid {
             sum = scalarVectorMult(1/count, sum); // steer towards center
             return this.seek(sum);
         }
+        return steer;
+    }
+
+    jitter(){
+        var steer, desiredDir;
+        //Steer = Desired - Velocity
+        desiredDir = getRandomDirectionInAngleRange(this.velocity, this.jitterAngle, true);
+        steer = scalarVectorMult(this.maxSpeed, desiredDir);
+        steer = limitVectorMagSq(vectorSubtract(steer, this.velocity), this.maxForce, this.maxForceSq);
         return steer;
     }
 

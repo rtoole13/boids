@@ -7,9 +7,11 @@ var CANVASHEIGHT = 760,
     boidCount = 50,
     boidWidth = 10,
     boidHeight = 20,
+    jitterAngle = 90,
     separationWeight = 1.5,
     alignmentWeight = 1.0,
     cohesionWeight = 1.0,
+    jitterWeight = 1.0,
 
 //controls
     mouseX,
